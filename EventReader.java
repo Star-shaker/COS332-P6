@@ -5,11 +5,13 @@ import java.util.ArrayList;
 
 public class EventReader 
 {
+    // This will read the textfile and create events for each line in the textfile
     public ArrayList<Event> eventList;
 
     public EventReader(String fileName) 
     {
         this.eventList = new ArrayList<>();
+        readFile(fileName);
     }
 
     public void readFile(String fileName) 
