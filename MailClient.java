@@ -40,13 +40,25 @@ public class MailClient {
         assertSuccess(heloResponse);
     }
 
-    public void sendMail(String from, String[] recipients, String subject, String data) {
+    public void sendMail(String from, String[] recipients, String subject, String data, String base64Image, String attachmentName) {
         // Throw err if connection not established
         if (mailSocket == null) {
             throw new RuntimeException("No connection with mailserver established");
         }
 
         try {
+            // boundary string taken from the textbook
+            // boundary string should be very unique such that a person writing an email
+            // does not accidentally use it in their email body (which is HIGHLY unlikely in this case)
+
+            // "The  encapsulation  boundary   is defined   as  a  line  consisting  entirely  of  two  hyphen
+            // characters ("-", decimal code 45) followed by  the  boundary parameter value from the 
+            // Content-Type header field." 
+            // - RFC 1341
+
+            String boundary = "------=_NextPart_000_04AD_01CBEAE1.BC8512D0";
+
+
             String serverResponse;
             out.write("MAIL FROM:<%s>\r\n".formatted(from));
             out.flush();
@@ -66,9 +78,33 @@ public class MailClient {
             serverResponse = in.readLine();
             assertSuccess(serverResponse);
 
-            out.write("Subject: %s\r\nFrom: %s\r\n\r\n".formatted(subject, from));
-            out.write(data + "\r\n.\r\n");
+            out.write("Subject: %s\r\n".formatted(subject));
+            out.write("From: %s\r\n".formatted(from));
+            out.write("To: %s\r\n".formatted(String.join(", ", recipients)));
+
+            // Declare that we are using MIME
+            out.write("MIME-Version: 1.0\r\n");
+            out.write("Content-Type: multipart/mixed; boundary=\"%s\"\r\n".formatted(boundary));
+            out.write("\r\n");
+
+            // This is the plain text that we send
+            out.write("--" + boundary + "\r\n"); // -- Says that this is the boundary
+            out.write("Content-Type: text/plain; charset=\"utf-8\"\r\n");
+            out.write("Content-Transfer-Encoding: 8bit\r\n\r\n");
+            out.write(data + "\r\n");
+
+            // This is the image that we send
+            out.write("--" + boundary + "\r\n");
+            out.write("Content-Type: image/png;\r\n");
+            out.write("Content-Disposition: attachment; filename=\"%s\"\r\n".formatted(attachmentName));
+            out.write("Content-Transfer-Encoding: base64\r\n");
+            out.write("\r\n");
+            out.write(base64Image + "\r\n");
+            
+            out.write("--" + boundary + "--\r\n"); // Absolute end of the MIME contents, so it will be --------=_NextPart_000_04AD_01CBEAE1.BC8512D0--
+            out.write(".\r\n");
             out.flush();
+            
             serverResponse = in.readLine();
             assertSuccess(serverResponse);
 
