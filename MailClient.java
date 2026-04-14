@@ -66,7 +66,7 @@ public class MailClient {
             serverResponse = in.readLine();
             assertSuccess(serverResponse);
 
-            out.write("Subject: %s\r\n\r\n".formatted(subject));
+            out.write("Subject: %s\r\nFrom: %s\r\n\r\n".formatted(subject, from));
             out.write(data + "\r\n.\r\n");
             out.flush();
             serverResponse = in.readLine();
