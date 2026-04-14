@@ -1,3 +1,7 @@
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Base64;
+
 public class Main {
     public static void main(String[] args) {
         ReminderHandler reminderHandler = new ReminderHandler();
@@ -16,10 +20,23 @@ public class Main {
 
         for (Event event : reminderHandler.reminders) 
         {
-            data += event.day + "/" + event.month + " " + event.description + "\n";
+            data += event.day + "/" + event.month + " " + event.description + "\r\n";
         }
 
-        mailClient.sendMail(from, to, subject, data);
+        String base64Image = "";
+        String fileName = "cat.jpg";
+
+        try 
+        {
+            byte[] imageBytes = Files.readAllBytes(Path.of(fileName));
+            base64Image = Base64.getMimeEncoder().encodeToString(imageBytes);
+        } 
+        catch (Exception e) 
+        {
+            System.out.println("No image found");
+        }
+
+        mailClient.sendMail(from, to, subject, data, base64Image, fileName);
         mailClient.closeConnection();
     }
 }
