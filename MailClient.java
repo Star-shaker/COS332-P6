@@ -78,15 +78,12 @@ public class MailClient {
             serverResponse = in.readLine();
             assertSuccess(serverResponse);
 
-            out.write("SUBJECT: %s\r\n".formatted(subject));
-
-            String oldAT = from.replace("@", " AT ");
-            out.write("FROM: %s\r\n".formatted(oldAT));
+            out.write("Subject: %s\r\n".formatted(subject));
+            out.write("From: %s\r\n".formatted(from));
 
             // Declare that we are using MIME
             out.write("MIME-Version: 1.0\r\n");
-            out.write("Content-Type: multipart/mixed;\r\n");
-            out.write(" boundary=\"%s\"\r\n".formatted(boundary));
+            out.write("Content-Type: multipart/mixed; boundary=\"%s\"\r\n".formatted(boundary));
             out.write("\r\n");
 
             // This is the plain text that we send
@@ -97,7 +94,7 @@ public class MailClient {
 
             // This is the image that we send
             out.write("--" + boundary + "\r\n");
-            out.write("Content-Type: image/jpeg;");
+            out.write("Content-Type: image/png;\r\n");
             out.write("Content-Disposition: attachment; filename=\"%s\"\r\n".formatted(attachmentName));
             out.write("Content-Transfer-Encoding: base64\r\n");
             out.write("\r\n");

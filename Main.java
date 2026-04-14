@@ -11,6 +11,7 @@ public class Main {
             mailClient.connect();
         } catch (Exception e) {
             System.out.println("Failed to open SMTP connection: " + e.getMessage());
+            return;
         }
 
         String from = "test@mg.com";
@@ -24,7 +25,7 @@ public class Main {
         }
 
         String base64Image = "";
-        String fileName = "cat.jpg";
+        String fileName = "cat.png";
 
         try 
         {
