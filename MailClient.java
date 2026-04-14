@@ -80,6 +80,7 @@ public class MailClient {
 
             out.write("Subject: %s\r\n".formatted(subject));
             out.write("From: %s\r\n".formatted(from));
+            out.write("To: %s\r\n".formatted(String.join(", ", recipients)));
 
             // Declare that we are using MIME
             out.write("MIME-Version: 1.0\r\n");
